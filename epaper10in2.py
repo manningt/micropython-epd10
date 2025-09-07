@@ -110,9 +110,9 @@ class EPD:
         self._command(TEMPERATURE_CALIBRATION, b'\x00') #x41
         self._command(VCOM_AND_DATA_INTERVAL_SETTING, b'\x37') #0x50
         self._command(TCON_SETTING, b'\x02\x02') #0x60
-        # self._command(TCON_RESOLUTION, ustruct.pack(">HH", EPD_WIDTH, EPD_HEIGHT)) #0x61  
-        self._command(TCON_RESOLUTION, b'\x03\xC0\x02\x80') #0x61  width/256, width%256, height/256, height%256
+        self._command(TCON_RESOLUTION, ustruct.pack(">HH", EPD_WIDTH, EPD_HEIGHT)) #0x61  
         # https://docs.micropython.org/en/latest/library/struct.html  big-endian, unsigned short
+        # self._command(TCON_RESOLUTION, b'\x03\xC0\x02\x80') #0x61  width/256, width%256, height/256, height%256
         self._command(0x62, b'\x98\x98\x98\x75\xCA\xB2\x98\x7E') # LUT for VCOM ????
         self._command(SPI_FLASH_CONTROL, b'\x00\x00\x00\x00') #x65
         self._command(0xE7, b'\x1C') # LUT for red ?
@@ -120,7 +120,6 @@ class EPD:
         self._command(0xE9, b'\x01') # LUT for red ?
         self._command(PLL_CONTROL, b'\x08') #x30
         self._command(POWER_ON) #0x04
-        # print('init: before wait_until_idle')
         count = self.wait_until_idle()
         print(f'wait_until_idle after init count={count}') 
         if count > 200:
@@ -129,11 +128,11 @@ class EPD:
         else:
             return True
         '''
-        self._command(POWER_SETTING, b'\x37\x00')
-        self._command(PANEL_SETTING, b'\xCF\x08')
+        self._command(POWER_SETTING, b'\x37\x00') #x01
+        self._command(PANEL_SETTING, b'\xCF\x08') #x00
         self.wait_until_idle()
-        self._command(VCM_DC_SETTING, b'\x1E') # decide by LUT file
-        self._command(FLASH_MODE, b'\x03')
+        self._command(VCM_DC_SETTING, b'\x1E') #0x82 decide by LUT file
+        self._command(FLASH_MODE, b'\x03') #0xE5
         '''
 
     def wait_until_idle(self):
@@ -176,21 +175,20 @@ class EPD:
         sleep_ms(100)
         self.wait_until_idle()
 
-    # to wake call reset() or init()
     def sleep(self):
         self._command(POWER_OFF)
         self.wait_until_idle()
         self._command(DEEP_SLEEP, b'\xA5')
 
     def clear(self, color=0x55):
+        # x00 black; 0xFF red;  0xAA yellow; 0x55 white
         if self.width % 4 == 0 :
             Width = self.width // 4
         else :
             Width = self.width // 4 + 1
-
+        # Width = 960 // 4 = 240
+        fill = bytearray([color] * Width)
         self._command(DATA_START_TRANSMISSION_1)
         for j in range(0, self.height):
-            for i in range(0, Width):
-                self._data(bytearray(color))
+            self._data(fill)
         self._command(DISPLAY_REFRESH)
-
