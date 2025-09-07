@@ -20,6 +20,24 @@ Upon waking up from deep sleep, main.py would:
 -
 
 # server software
-Install FTP server software as per these instructions: https://github.com/SpotlightKid/micropython-ftplib/blob/master/ftplib.py
+Install FTP server software as per these instructions: https://www.geeksforgeeks.org/linux-unix/setup-and-configure-an-ftp-server-in-linux/
 - the config variables for an FTP user and passive mode do not have to be configured
 - 
+
+# useful links:
+ - https://github.com/mcauser/micropython-waveshare-epaper
+ - 10.2inch display:
+   - https://www.waveshare.com/product/displays/e-paper/epaper-1/10.2inch-e-paper-hat-g.htm?___SID=U
+   - https://www.waveshare.com/wiki/10.2inch_e-Paper_HAT_(G)
+   - https://www.waveshare.com/wiki/E-Paper_Driver_HAT#Questions_about_Hardware
+ - https://docs.micropython.org/en/latest/reference/repl.html
+ - https://github.com/dhylands/rshell
+ - Tinypico:
+   - https://www.tinypico.com/code-examples
+ - adafruit breakout Friend:
+   - https://www.adafruit.com/product/4224
+- 2.13inch display:
+   - https://seengreat.com/product/190/2-13inch-e-paper-display
+   - https://github.com/seengreat/2.13inch-E-Paper-Display-V2/blob/main/Raspberry-Pi_2.13_V2/python/epd_2inch13.py
+
+
