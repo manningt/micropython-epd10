@@ -6,7 +6,6 @@ BUSY pin changed from 34 to 27
 '''
 from machine import Pin, SPI
 from epaper10in2 import EPD
-# from epaper2in1 import EPD
 
 sck = Pin(18)
 miso = Pin(19)
@@ -18,7 +17,13 @@ busy = Pin(27)
 spi = SPI(2, baudrate=4000000, polarity=0, phase=0, sck=sck, miso=miso, mosi=mosi)
 
 e = EPD(spi, cs, dc, rst, busy)
-init_ok = e.init()
-print(f"{init_ok=}")
-e._command(0x12, b'\x00')
-# e.clear()
+if not e.init():
+   print("Init failed")
+
+with open("open-welcome.bin", 'rb') as file:
+   byte_array = bytearray(file.read())
+e.display(byte_array)
+
+with open("closed-no-guide.bin", 'rb') as file:
+   byte_array = bytearray(file.read())
+e.display(byte_array)
