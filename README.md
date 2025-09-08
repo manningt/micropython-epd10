@@ -34,10 +34,14 @@ Install FTP server software as per these instructions: https://www.geeksforgeeks
  - https://github.com/dhylands/rshell
  - Tinypico:
    - https://www.tinypico.com/code-examples
+   - https://help.unexpectedmaker.com/index.php/knowledge-base/what-voltage-range-can-the-5v-pin-accept-and-is-it-an-input-and-output/
+
  - adafruit breakout Friend:
    - https://www.adafruit.com/product/4224
 - 2.13inch display:
    - https://seengreat.com/product/190/2-13inch-e-paper-display
    - https://github.com/seengreat/2.13inch-E-Paper-Display-V2/blob/main/Raspberry-Pi_2.13_V2/python/epd_2inch13.py
+- other ESP32 modules:
+   - https://detailspin.com/wp-content/images/zkw-esp32-wroom-pinout-arduino.jpg
 
 
