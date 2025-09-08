@@ -150,30 +150,10 @@ class EPD:
         self.rst(1)
         sleep_ms(200)
 
-    # draw the current frame memory
-    def display_frame(self, frame_buffer):
+    def display(self, buf):
         self._command(DATA_START_TRANSMISSION_1)
-        for i in range(0, self.width * self.height // 8):
-            temp1 = frame_buffer[i]
-            j = 0
-            while (j < 8):
-                if (temp1 & 0x80):
-                    temp2 = 0x03
-                else:
-                    temp2 = 0x00
-                temp2 = (temp2 << 4) & 0xFF
-                temp1 = (temp1 << 1) & 0xFF
-                j += 1
-                if (temp1 & 0x80):
-                    temp2 |= 0x03
-                else:
-                    temp2 |= 0x00
-                temp1 = (temp1 << 1) & 0xFF
-                self._data(bytearray([temp2]))
-                j += 1
+        self._data(buf)
         self._command(DISPLAY_REFRESH)
-        sleep_ms(100)
-        self.wait_until_idle()
 
     def sleep(self):
         self._command(POWER_OFF)
