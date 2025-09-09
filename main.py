@@ -1,7 +1,17 @@
 import machine, sys
 import display_app
-try:
-    display_app.main()
-except Exception as e:
-    print("Fatal error in main:")
-    sys.print_exception(e)
+
+cause_constants = ["ZERO", "PWRON_RESET", "HARD_RESET", "WDT_RESET", "DEEPSLEEP_RESET", "SOFT_RESET", "BROWN_OUT_RESET"]
+reset_cause = machine.reset_cause()
+print("reset_cause={}: {}".format(reset_cause, cause_constants[reset_cause] if reset_cause < len(cause_constants) else "unknown"), end='')
+if reset_cause != machine.DEEPSLEEP_RESET:
+    print('; clearing RTC memory')
+    machine.RTC().memory(b'')
+else:
+    print('')
+
+# try:
+#     display_app.main()
+# except Exception as e:
+#     print("Fatal error in main:")
+#     sys.print_exception(e)
