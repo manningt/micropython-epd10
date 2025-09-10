@@ -4,6 +4,8 @@ import machine
 import ujson as json
 import tinypico
 from epaper10in2 import EPD
+from img_map import img_map
+from time import sleep
 
 def setup_station(ssid, password):
    sta_if = network.WLAN(network.STA_IF)
@@ -82,7 +84,7 @@ def main():
       my_deep_sleep(15)
 
    setup_station(config['ssid'], config['password'])
-   time.sleep_ms(3000)
+   sleep(4)
 
    ftp = setup_ftp(config['ftp_host'], config['ftp_user'], config['ftp_password'])
    if ftp is None:
@@ -105,22 +107,26 @@ def main():
 
    if restored_image_number == server_image_number:
       print(f"{restored_image_number=} matches {server_image_number=}: not updating display")
-      my_deep_sleep(config['sleep'])
    else:
-      print(f"changing display from {restored_image_number=} to {server_image_number=}")
+      image_filename = img_map[server_image_number] + ".bin"
+      print(f"changing display from {restored_image_number=} to {server_image_number=}; displaying {image_filename}")
       rtc.memory(bytearray(json.dumps({"img_num": server_image_number}).encode()))
 
-      # spi = machine.SPI(2, baudrate=4000000, polarity=0, phase=0, sck=sck, miso=miso, mosi=mosi)
-      # e = EPD(spi, cs, dc, rst, busy)
-      # if not e.init():
-      #    print("e-paper init failed")
-      # with open("open-welcome.bin", 'rb') as file:
-      #    byte_array = bytearray(file.read())
-      # e.display(byte_array)
+      spi = machine.SPI(2, baudrate=4000000, polarity=0, phase=0, sck=sck, miso=miso, mosi=mosi)
+      e = EPD(spi, cs, dc, rst, busy)
+      if not e.init():
+         print("e-paper init failed")
+      else:
+         try:
+            with open(image_filename, 'rb') as file:
+               byte_array = bytearray(file.read())
+         except Exception as ex:
+            print(f"Not updating display due to Error reading {image_filename}: {ex}")
+            byte_array = None
+         if byte_array is not None:
+            e.display(byte_array)
+         sleep(30)
+         e.sleep()
+         spi.deinit()
 
-
-   if 0:
-      state = {"img_num": 3}
-      rtc.memory(bytearray(json.dumps(state).encode())) # store state as JSON in RTC memory
-      restored_image_number = json.loads(rtc.memory().decode())
-
+   my_deep_sleep(config['sleep'])
