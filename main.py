@@ -10,8 +10,9 @@ if reset_cause != machine.DEEPSLEEP_RESET:
 else:
     print('')
 
-# try:
-#     display_app.main()
-# except Exception as e:
-#     print("Fatal error in main:")
-#     sys.print_exception(e)
+if 1:
+    try:
+        display_app.main()
+    except Exception as e:
+        print("Fatal error in main:")
+        sys.print_exception(e)
