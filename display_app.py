@@ -29,7 +29,7 @@ def setup_ftp(host, user, password):
 
 def get_image_number(ftp):
    rc = None
-   for i in range(1, 5):
+   for i in range(1, len(img_map)+1):
       try:
          ftp.cwd(str(i))
          rc = i
@@ -54,10 +54,10 @@ def read_config(filename="config.json"):
       print(f"Error loading {filename}: {e}")
    return config
 
-def restore_state():
+def restore_state(rtc=machine.RTC()):
    tmp = None
    try:
-      tmp = json.loads(rtc.memory().decode)
+      tmp = json.loads(rtc.memory().decode())
       print(f"RTC.memory={tmp}")
       if type(tmp) is not dict:
             print(f"Warning (restore_state): RTC.memory={tmp} is not a dictionary")
@@ -70,6 +70,7 @@ def restore_state():
 def main():
    tinypico.set_dotstar_power(False)
    rtc = machine.RTC()
+
    sck = machine.Pin(18)
    miso = machine.Pin(19)
    mosi = machine.Pin(23)
@@ -99,7 +100,7 @@ def main():
    server_image_number = get_image_number(ftp)
    ftp.quit()
 
-   restored_state = restore_state()
+   restored_state = restore_state(rtc)
    if restored_state is not None and 'img_num' in restored_state:
       restored_image_number = restored_state['img_num']
    else:
