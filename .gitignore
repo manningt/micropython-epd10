@@ -3,3 +3,4 @@ epaper7in5.py
 registers.txt
 *.bin
 *.json
+__pycache__/
