@@ -30,8 +30,9 @@ def setup_ftp(host, user, password):
 def get_image_number(ftp):
    rc = None
    for i in range(1, len(img_map)+1):
+      dir_name = 'm' + str(i)
       try:
-         ftp.cwd(str(i))
+         ftp.cwd(dir_name)
          rc = i
          break
       except Exception as e:
