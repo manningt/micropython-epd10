@@ -11,6 +11,18 @@ def setup_station(ssid, password):
    sta_if = network.WLAN(network.STA_IF)
    sta_if.active(True)
    sta_if.connect(ssid, password)
+   for _ in range(10):
+      sleep(1)
+      if sta_if.isconnected():
+         break
+      else:
+         print(".  ", end='')
+   if sta_if.isconnected():
+      print('  my IP:', sta_if.ifconfig()[0])
+   else:
+      print("Failed to connect to WiFi")
+      sta_if.active(False)
+      sta_if = None
    return sta_if
 
 def setup_ftp(host, user, password):
@@ -36,7 +48,23 @@ def get_image_number(ftp):
          rc = i
          break
       except Exception as e:
-         print(f"{i}: {e}")
+         print(f"get_image_number cwd {dir_name}: {e}")
+   #restore cwd
+   if rc is not None:
+      ftp.cwd('..')
+   return rc
+
+def get_deep_sleep_seconds(ftp):
+   rc = None
+   seconds_list = [0, 30, 60, 300, 3600, 86400]
+   for i in range(1, len(seconds_list)+1):
+      dir_name = 't' + str(seconds_list[i])
+      try:
+         ftp.cwd(dir_name)
+         rc = seconds_list[i]
+         break
+      except Exception as e:
+         print(f"get_deep_sleep_seconds cwd {dir_name}: {e}")
    #restore cwd
    if rc is not None:
       ftp.cwd('..')
@@ -44,6 +72,7 @@ def get_image_number(ftp):
 
 def my_deep_sleep(seconds):
    print(f"deep sleep for {seconds} seconds")
+   sleep(1)
    machine.deepsleep(seconds * 1000)
 
 def read_config(filename="config.json"):
@@ -82,11 +111,13 @@ def main():
 
    config = read_config()
    if config is None:
-      print("No config, sleeping 300 seconds")
+      print("No config; calling deep sleep")
       my_deep_sleep(15)
 
-   setup_station(config['ssid'], config['password'])
-   sleep(4)
+   station = setup_station(config['ssid'], config['password'])
+   if station is None:
+      print("WiFi not connecting")
+      my_deep_sleep(config['sleep'])
 
    ftp = setup_ftp(config['ftp_host'], config['ftp_user'], config['ftp_password'])
    if ftp is None:
@@ -99,6 +130,10 @@ def main():
       my_deep_sleep(config['sleep'])
 
    server_image_number = get_image_number(ftp)
+   deep_sleep_seconds_from_server = get_deep_sleep_seconds(ftp)
+   if deep_sleep_seconds_from_server is None:
+      print("No valid deep_sleep_seconds from server")
+      deep_sleep_seconds_from_server = 300
    ftp.quit()
 
    restored_state = restore_state(rtc)
@@ -127,8 +162,9 @@ def main():
             byte_array = None
          if byte_array is not None:
             e.display(byte_array)
+         # wait for display update to finish
          sleep(30)
          e.sleep()
          spi.deinit()
 
-   my_deep_sleep(config['sleep'])
+   my_deep_sleep(deep_sleep_seconds_from_server)
