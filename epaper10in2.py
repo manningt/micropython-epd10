@@ -102,7 +102,7 @@ class EPD:
         self.cs(1)
 
     def init(self):
-        print('EPD init start')
+        print('EPD init: starting')
         self.reset()
 
         self._command(PANEL_SETTING, b'\x0F\x29') #x00
@@ -121,7 +121,7 @@ class EPD:
         self._command(PLL_CONTROL, b'\x08') #x30
         self._command(POWER_ON) #0x04
         count = self.wait_until_idle()
-        print(f'wait_until_idle after init count={count}') 
+        print(f'EPD init: wait_until_idle returned after count={count}') 
         if count > 200:
             print('wait_until_idle timed out after init')
             return False
