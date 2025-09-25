@@ -56,7 +56,7 @@ def get_image_number(ftp):
 
 def get_deep_sleep_seconds(ftp):
    rc = None
-   seconds_list = [0, 30, 60, 300, 3600, 86400]
+   seconds_list = [0, 30, 60, 600, 3600, 28800] # 1 min, 5 min, 1 hr, 8 hr
    for i in range(1, len(seconds_list)+1):
       dir_name = 't' + str(seconds_list[i])
       try:
